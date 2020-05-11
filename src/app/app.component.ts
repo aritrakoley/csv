@@ -19,7 +19,11 @@ export class AppComponent {
     console.log(this.fileList[0]);
     console.log(typeof(this.fileList));
 
-    let template_headers = ['fa', 'fb', 'fc']; // Actual Headers in the Template (comes from API)
+    // Actual Headers in the Template (comes from API)
+    let template_headers = {
+      mandatory: ['fa', 'fb', 'fc'],
+      optional: ['fd', 'fe']
+     };
 
     this.valid = new Array(this.fileList.length);
     for(let i=0; i<this.fileList.length; i++) {
@@ -28,17 +32,18 @@ export class AppComponent {
 
   }
 
-
-  matchHeaders(th: string[], fh: string[]) {
-    if ( th.length !== fh.length ){
+  matchHeaders(th, fh: string[]) {
+    if ( fh.length < th.mandatory.length ){
+      return false;
+    }
+    else if ( fh.length > (th.mandatory.length + th.optional.length) ) {
       return false;
     }
     else {
+      for ( let i=0; i<th.mandatory.length; i++ ) {
 
-      for ( let i=0; i<th.length; i++ ) {
-
-        if(th[i] !== fh[i]) {
-          return false
+        if ( fh.indexOf(th.mandatory[i]) === -1 ) {
+          return false;
         }
 
       }
@@ -48,28 +53,32 @@ export class AppComponent {
   }
 
 
-  validate(th: string[], f: File, index: number) {
+  validate(th, f: File, index: number) {
     let reader = new FileReader();
 
     reader.onload = () => {
+      let hm: boolean = false;
+      let rm: boolean = false;
 
       // (1) Match Headers
       const lines = (reader.result as string).split('\n');
       const fh = lines[0].split(',').map( (x) => { return x.trim(); } );
       console.log(fh);
       console.log(th);
-      const hm: boolean = this.matchHeaders(th, fh);
+      hm = this.matchHeaders(th, fh);
 
-      // (2) Match Length of All Other Rows to Length of Headers
-      let rm: boolean = true;
-      let li: string[];
-      for (let i=1; i<lines.length; i++) {
+      if ( hm === true ) {
+        // (2) Match Length of All Other Rows to Length of Headers
+        rm = true;
+        let li: string[];
+        for (let i=1; i<lines.length; i++) {
 
-        li = lines[i].split(',').map( (x) => { return x.trim(); } );
+          li = lines[i].split(',').map( (x) => { return x.trim(); } );
 
-        if ( li.length !== th.length ) {
-          rm = false;
-          break;
+          if ( li.length !== fh.length ) {
+            rm = false;
+            break;
+          }
         }
       }
 
