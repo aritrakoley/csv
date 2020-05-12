@@ -9,7 +9,6 @@ export class AppComponent {
   title = 'validator';
 
   fileList;
-  valid: boolean[];
 
   selectFiles(event) {
     console.log(event);
@@ -25,10 +24,31 @@ export class AppComponent {
       optional: ['fd', 'fe']
      };
 
-    this.valid = new Array(this.fileList.length);
-    for(let i=0; i<this.fileList.length; i++) {
-      this.validate(template_headers, this.fileList[i], i);
-    }
+    // Validation Function (returns an array of flags corresponding to each file)
+    const p = this.validateAllFiles(template_headers, this.fileList);
+    p.then( (valid) => {
+      console.log('IN MAIN: VALIDITY OF ALL FILES CHECKED');
+      console.log(valid);
+
+    // OTHER PROGRAM LOGIC RELATED TO VALIDITY
+    });
+
+  }
+
+  validateAllFiles(th, fl) {
+    return new Promise( ( resolve, reject ) => {
+      let parr = new Array();
+      for ( let i=0; i<this.fileList.length; i++ ) {
+        parr.push(this.validate(th, this.fileList[i], i));
+      }
+
+      Promise.all(parr).then( ( valid ) => {
+        console.log('VALIDITY OF ALL FILES CHECKED');
+        console.log(valid);
+        resolve(valid);
+      });
+
+    });
 
   }
 
@@ -54,40 +74,49 @@ export class AppComponent {
 
 
   validate(th, f: File, index: number) {
-    let reader = new FileReader();
 
-    reader.onload = () => {
-      let hm: boolean = false;
-      let rm: boolean = false;
+    return new Promise((resolve, reject) => {
+      let reader = new FileReader();
 
-      // (1) Match Headers
-      const lines = (reader.result as string).split('\n');
-      const fh = lines[0].split(',').map( (x) => { return x.trim(); } );
-      console.log(fh);
-      console.log(th);
-      hm = this.matchHeaders(th, fh);
+      reader.onload = () => {
+        let hm: boolean = false;
+        let rm: boolean = false;
 
-      if ( hm === true ) {
-        // (2) Match Length of All Other Rows to Length of Headers
-        rm = true;
-        let li: string[];
-        for (let i=1; i<lines.length; i++) {
+        // (1) Match Headers
+        const lines = (reader.result as string).split('\n');
+        const fh = lines[0].split(',').map( (x) => { return x.trim(); } );
+        console.log(fh);
+        console.log(th);
+        hm = this.matchHeaders(th, fh);
 
-          li = lines[i].split(',').map( (x) => { return x.trim(); } );
+        if ( hm === true ) {
+          // (2) Match Length of All Other Rows to Length of Headers
+          rm = true;
+          let li: string[];
+          for (let i=1; i<lines.length; i++) {
 
-          if ( li.length !== fh.length ) {
-            rm = false;
-            break;
+            li = lines[i].split(',').map( (x) => { return x.trim(); } );
+
+            if ( li.length !== fh.length ) {
+              rm = false;
+              break;
+            }
           }
         }
-      }
 
-      this.valid[index] = ( hm && rm );
+        // this.valid[index] = ( hm && rm );
+        // console.log(this.valid);
 
-      console.log({index, lines, hm, rm});
-      console.log(this.valid);
-    };
+        const local_valid: boolean = ( hm && rm );
+        const msg = { valid: local_valid };
+        console.log({index, lines, hm, rm, local_valid, msg});
 
-    reader.readAsText(f);
+        resolve(local_valid);
+      };
+
+      reader.readAsText(f);
+
+    });
+
   }
 }
