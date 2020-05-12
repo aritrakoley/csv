@@ -11,12 +11,13 @@ export class AppComponent {
   fileList;
 
   selectFiles(event) {
-    console.log(event);
+    // console.log(event);
     this.fileList = event.target.files;
     console.log(this.fileList);
-    console.log(this.fileList.length);
-    console.log(this.fileList[0]);
-    console.log(typeof(this.fileList));
+    // console.log(this.fileList);
+    // console.log(this.fileList.length);
+    // console.log(this.fileList[0]);
+    
 
     // Actual Headers in the Template (comes from API)
     let template_headers = {
@@ -39,12 +40,17 @@ export class AppComponent {
     return new Promise( ( resolve, reject ) => {
       let parr = new Array();
       for ( let i=0; i<this.fileList.length; i++ ) {
+
         parr.push(this.validate(th, this.fileList[i], i));
+
+        // this.validate(th, this.fileList[i], i)
+        // .then((msg) => console.log(">>>>>>>>>>>>>>>>>>>", msg))
+        // .catch((msg) => console.log("ERROR"));
       }
 
       Promise.all(parr).then( ( valid ) => {
-        console.log('VALIDITY OF ALL FILES CHECKED');
-        console.log(valid);
+        // console.log('VALIDITY OF ALL FILES CHECKED');
+        // console.log(valid);
         resolve(valid);
       });
 
@@ -60,12 +66,21 @@ export class AppComponent {
       return false;
     }
     else {
+
+      // (1) Check if all mandatory fields are present
       for ( let i=0; i<th.mandatory.length; i++ ) {
 
         if ( fh.indexOf(th.mandatory[i]) === -1 ) {
           return false;
         }
+      }
 
+      // (2) Check if any unmapped fields are present in fh that are not in th
+      for ( let i=0; i<fh.length; i++ ) {
+
+        if ( th.mandatory.indexOf(fh[i]) === -1 && th.optional.indexOf(fh[i]) === -1) {
+          return false;
+        }
       }
     }
 
@@ -85,8 +100,8 @@ export class AppComponent {
         // (1) Match Headers
         const lines = (reader.result as string).split('\n');
         const fh = lines[0].split(',').map( (x) => { return x.trim(); } );
-        console.log(fh);
-        console.log(th);
+        // console.log(fh);
+        // console.log(th);
         hm = this.matchHeaders(th, fh);
 
         if ( hm === true ) {
@@ -109,7 +124,7 @@ export class AppComponent {
 
         const local_valid: boolean = ( hm && rm );
         const msg = { valid: local_valid };
-        console.log({index, lines, hm, rm, local_valid, msg});
+        // console.log({index, lines, hm, rm, local_valid, msg});
 
         resolve(local_valid);
       };
