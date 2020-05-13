@@ -1,26 +1,4 @@
-import { Component } from '@angular/core';
-import { api_res } from '../assets/api_response';
-
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
-})
-export class AppComponent {
-  title = 'validator';
-
-  selectFiles(event) {
-    const fileList = event.target.files;
-    console.log(fileList);
-
-    // Actual Headers in the Template (comes from API)
-    const apiResponse = api_res;
-
-    // Calls validation function on each file
-    this.validateAllFiles(apiResponse, fileList);
-  }
-
-  validateAllFiles(apiResponse, fileList) {
+validateAllFiles(apiResponse, fileList) {
 
     const templateHeaders = this.getTemplateHeaders(apiResponse);
 
@@ -73,7 +51,7 @@ export class AppComponent {
         const lines = (reader.result as string).split('\n');
         const fh = lines[0].split(',').map( x => x.trim() );
 
-        console.log({f, index, lines, th});
+        // console.log({f, index, lines});
         resolve(this.matchHeaders(th, fh));
       };
 
@@ -87,4 +65,3 @@ export class AppComponent {
     });
 
   }
-}
