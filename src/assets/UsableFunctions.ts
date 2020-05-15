@@ -16,7 +16,7 @@ validateAllFiles(apiResponse, fileList) {
 
     let hdrs = new Array();
     for(let i = 0; i < tf.length; i++) {
-      hdrs.push(tf[i].default_value);
+      hdrs.push(tf[i].default_value.trim());
     }
 
     return hdrs;

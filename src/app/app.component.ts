@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { api_res } from '../assets/api_response';
+import { api_res } from '../assets/API_response';
 
 @Component({
   selector: 'app-root',
@@ -38,7 +38,7 @@ export class AppComponent {
 
     let hdrs = new Array();
     for(let i = 0; i < tf.length; i++) {
-      hdrs.push(tf[i].default_value);
+      hdrs.push(tf[i].default_value.trim());
     }
 
     return hdrs;

@@ -22,19 +22,19 @@ export const api_res = {
                 "id": 2,
                 "client_field_name_display": "START TIME",
                 "client_field_name": "start_time",
-                "default_value": "fb"
+                "default_value": " fb"
             },
             {
                 "id": 3,
                 "client_field_name_display": "END TIME",
                 "client_field_name": "end_time",
-                "default_value": "fc"
+                "default_value": " fc"
             },
             {
                 "id": null,
                 "client_field_name_display": "url_type",
                 "client_field_name": "custom_field_4",
-                "default_value": "fd"
+                "default_value": " fd"
             }
         ],
         "template_code": "TC-a57ojwddvka3v9mj3",
